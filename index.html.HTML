@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ReBite | Save Food. Save Money.</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --sage: #8FBF9F;
+      --cream: #FFF8F0;
+      --beige: #F5E6D3;
+      --soft-orange: #FF9F6E;
+      --dark: #2B2B2B;
+      --glass-bg: rgba(255, 248, 240, 0.7);
+      --glass-border: rgba(143, 191, 159, 0.2);
+      --shadow-sm: 0 20px 35px -12px rgba(0,0,0,0.08);
+      --shadow-md: 0 25px 40px -12px rgba(0,0,0,0.12);
+      --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    body.dark {
+      --cream: #1e2a23;
+      --beige: #2a3a30;
+      --dark: #F5F0E8;
+      --glass-bg: rgba(30, 42, 35, 0.75);
+      --glass-border: rgba(143, 191, 159, 0.35);
+      background: #121b16;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--cream);
+      color: var(--dark);
+      transition: background-color 0.3s, color 0.2s;
+      overflow-x: hidden;
+    }
+
+    /* LOADER */
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: var(--sage);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1s ease, visibility 0.5s;
+      backdrop-filter: blur(0px);
+    }
+    .loader.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-logo {
+      font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      background: rgba(255,255,240,0.2);
+      padding: 1rem 2rem;
+      border-radius: 80px;
+      animation: pulseScale 1.2s infinite alternate;
+    }
+    @keyframes pulseScale {
+      0% { transform: scale(0.95); letter-spacing: 2px; opacity: 0.7; }
+      100% { transform: scale(1.1); letter-spacing: 6px; opacity: 1; }
+    }
+
+    /* Sticky Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(18px);
+      background: var(--glass-bg);
+      border-bottom: 1px solid var(--glass-border);
+      z-index: 100;
+      padding: 1rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition);
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--sage), var(--soft-orange));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 500;
+      color: var(--dark);
+      transition: 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: var(--soft-orange);
+      transition: 0.3s;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .mobile-menu {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+    .dark-toggle {
+      background: transparent;
+      border: 1px solid var(--sage);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* responsive nav */
+    @media (max-width: 900px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        width: 70%;
+        height: 100vh;
+        padding-top: 3rem;
+        transition: 0.3s;
+        gap: 2rem;
+        border-right: 1px solid var(--glass-border);
+      }
+      .nav-links.active {
+        left: 0;
+      }
+      .mobile-menu {
+        display: block;
+      }
+    }
+
+    /* Particles background */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    section, footer, .hero, .stats, .cards, .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Utility */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      transition: 0.2s;
+      border: none;
+      cursor: pointer;
+      background: var(--dark);
+      color: var(--cream);
+    }
+    .btn-primary {
+      background: var(--soft-orange);
+      color: var(--dark);
+      box-shadow: 0 8px 18px rgba(255,159,110,0.3);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--sage);
+      color: var(--dark);
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+
+    /* Hero split */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .badge {
+      background: rgba(143,191,159,0.2);
+      backdrop-filter: blur(8px);
+      border-radius: 60px;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+    }
+    .floating-cards {
+      position: relative;
+      height: 500px;
+    }
+    .mock-card {
+      position: absolute;
+      background: white;
+      border-radius: 32px;
+      padding: 1rem;
+      box-shadow: var(--shadow-md);
+      width: 180px;
+      backdrop-filter: blur(4px);
+      background: rgba(255,255,245,0.85);
+      animation: float 5s infinite ease-in-out;
+    }
+    @keyframes float {
+      0% { transform: translateY(0px);}
+      50% { transform: translateY(-15px);}
+      100% { transform: translateY(0px);}
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 2rem;
+    }
+    .stat-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      flex: 1;
+      min-width: 180px;
+      transition: var(--transition);
+    }
+    .stat-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--soft-orange);
+    }
+
+    /* Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .how-card, .feature-card, .testimonial-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      padding: 2rem;
+      transition: var(--transition);
+      border: 1px solid var(--glass-border);
+    }
+    .how-card:hover, .testimonial-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-md);
+    }
+    .food-deal {
+      background: var(--glass-bg);
+      border-radius: 32px;
+      padding: 1.2rem;
+      min-width: 260px;
+      transition: 0.2s;
+    }
+    .deals-scroll {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+    .price-old { text-decoration: line-through; opacity: 0.7; }
+    .price-new { color: var(--soft-orange); font-weight: 800; font-size: 1.4rem; }
+
+    /* faq */
+    .faq-item {
+      background: var(--glass-bg);
+      margin-bottom: 1rem;
+      border-radius: 28px;
+      padding: 1rem 1.5rem;
+    }
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: 0.3s;
+    }
+    .faq-item.active .faq-answer {
+      max-height: 200px;
+      margin-top: 1rem;
+    }
+
+    /* ripple */
+    .ripple-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transform: scale(0);
+      animation: rippleAnim 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: 0.7s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    footer {
+      background: var(--beige);
+      border-radius: 48px 48px 0 0;
+      padding: 3rem 2rem 1rem;
+    }
+    @media (max-width: 768px) {
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="loader-logo">🍽️ ReBite</div>
+</div>
+
+<nav>
+  <div class="logo">ReBite</div>
+  <div class="mobile-menu" id="mobileMenuBtn"><i class="fas fa-bars"></i></div>
+  <div class="nav-links" id="navLinks">
+    <a href="#home">Home</a>
+    <a href="#features">Features</a>
+    <a href="#business">Businesses</a>
+    <a href="#impact">Impact</a>
+    <a href="#download">Download App</a>
+    <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i> Dark</button>
+  </div>
+</nav>
+
+<main>
+  <section id="home" class="container hero">
+    <div class="hero-grid">
+      <div class="hero-text reveal">
+        <h1 style="font-size: clamp(2rem,5vw,3.5rem); font-weight: 800; line-height:1.2;">Rescue Delicious Food Before It Goes To Waste</h1>
+        <p style="margin: 1.5rem 0; font-size: 1.2rem;">Discover discounted meals from nearby restaurants while helping reduce food waste across India.</p>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-primary ripple-btn">Download App</button>
+          <button class="btn btn-outline ripple-btn">Partner With Us</button>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+          <span class="badge"><i class="fas fa-tag"></i> 50–70% OFF</span>
+          <span class="badge"><i class="fas fa-leaf"></i> Eco Friendly</span>
+          <span class="badge"><i class="fas fa-utensils"></i> 1000+ Meals Saved</span>
+        </div>
+      </div>
+      <div class="floating-cards">
+        <div class="mock-card" style="top:10%; left:5%; animation-delay:0s;"><i class="fas fa-utensils"></i> Paneer Biryani <br> ₹299 → ₹99</div>
+        <div class="mock-card" style="top:40%; left:50%; animation-delay:0.5s;"><i class="fas fa-mobile-alt"></i> UPI Pay ₹49</div>
+        <div class="mock-card" style="bottom:15%; left:20%; animation-delay:1s;"><i class="fas fa-store"></i> Delhi, Bengaluru</div>
+        <div class="mock-card" style="top:60%; right:5%; animation-delay:0.2s;"><i class="fas fa-clock"></i> Pickup in 20min</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STATS -->
+  <section class="container reveal">
+    <div class="stats-grid" id="statsSection">
+      <div class="stat-card"><div class="stat-number" data-count="12500">0</div><div>Meals Saved</div></div>
+      <div class="stat-card"><div class="stat-number" data-count="520">0</div><div>Restaurants</div></div>
+      <div class="stat-card"><div class="stat-number" data-count="8200">0</div><div>Active Users</div></div>
+      <div class="stat-card"><div class="stat-number" data-count="3200">0</div><div>Tons Waste Reduced</div></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="container reveal">
+    <h2 style="text-align:center; font-size:2.5rem;">How It Works</h2>
+    <div class="card-grid">
+      <div class="how-card"><i class="fas fa-map-marker-alt" style="font-size:2.5rem;color:var(--soft-orange)"></i><h3>Discover Nearby Deals</h3><p>Real-time surplus food from top restaurants in Mumbai, Pune, Delhi.</p></div>
+      <div class="how-card"><i class="fas fa-clock" style="font-size:2.5rem;color:var(--soft-orange)"></i><h3>Reserve Food Instantly</h3><p>One tap, hold your meal at 50% off. Reserve within seconds.</p></div>
+      <div class="how-card"><i class="fas fa-walking" style="font-size:2.5rem;color:var(--soft-orange)"></i><h3>Pick Up & Save</h3><p>Collect at scheduled time, enjoy delicious food, save money + planet.</p></div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION with alternation -->
+  <section id="features" class="container reveal">
+    <h2 style="text-align:center">Premium Features</h2>
+    <div class="card-grid">
+      <div class="feature-card"><i class="fas fa-bolt"></i><h3>Real-Time Discounts</h3><p>Dynamic pricing on unsold meals, snag deals as they drop.</p></div>
+      <div class="feature-card"><i class="fas fa-calendar-check"></i><h3>Smart Pickup Scheduling</h3><p>Choose your slot, avoid rush, zero contact.</p></div>
+      <div class="feature-card"><i class="fas fa-rupee-sign"></i><h3>Secure UPI Payments</h3><p>Google Pay, PhonePe, Paytm – instant refunds.</p></div>
+      <div class="feature-card"><i class="fas fa-chart-line"></i><h3>Eco Impact Tracking</h3><p>Personal dashboard shows your CO₂ savings.</p></div>
+      <div class="feature-card"><i class="fas fa-chart-bar"></i><h3>Restaurant Analytics</h3><p>Detailed insights for partners to reduce waste.</p></div>
+      <div class="feature-card"><i class="fas fa-gem"></i><h3>Reward Points System</h3><p>Eco-points → free meals & UPI cashbacks.</p></div>
+    </div>
+  </section>
+
+  <!-- BUSINESS SECTION -->
+  <section id="business" class="container reveal" style="background: radial-gradient(circle at 10% 30%, rgba(143,191,159,0.2), transparent); border-radius: 3rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:center;">
+      <div><h2>Turn Unsold Food Into Revenue</h2><p>Join 500+ Indian restaurants recovering revenue & reducing waste.</p><button class="btn btn-primary ripple-btn" style="margin-top:1rem;">Join as a Business →</button></div>
+      <div class="mock-card" style="position:relative; background:var(--glass-bg); width:auto;"><i class="fas fa-chart-simple"></i> Revenue+32% <br> Food saved: 2.3 tons</div>
+    </div>
+  </section>
+
+  <!-- LIVE FOOD DEALS section (horizontal scroll) -->
+  <section class="container reveal">
+    <h2>🔥 Live Food Deals Near You</h2>
+    <div class="deals-scroll">
+      <div class="food-deal"><img src="https://placehold.co/200x120/FF9F6E/white?text=Biryani" style="width:100%; border-radius:24px;"><h3>Paneer Biryani</h3><p>Spice Bites, Virar</p><span class="price-old">₹299</span> <span class="price-new">₹99</span><br><button class="btn btn-primary ripple-btn" style="margin-top:8px;">Save Meal</button></div>
+      <div class="food-deal"><img src="https://placehold.co/200x120/8FBF9F/white?text=Dosa" style="width:100%; border-radius:24px;"><h3>Masala Dosa Combo</h3><p>South Tiffin, Bengaluru</p><span class="price-old">₹180</span> <span class="price-new">₹69</span><br><button class="btn btn-primary ripple-btn">Save Meal</button></div>
+      <div class="food-deal"><img src="https://placehold.co/200x120/F5E6D3/2B2B2B?text=Pav+Bhaji" style="width:100%; border-radius:24px;"><h3>Pav Bhaji Mega</h3><p>Mumbai Munch, Mumbai</p><span class="price-old">₹220</span> <span class="price-new">₹89</span><br><button class="btn btn-primary">Save Meal</button></div>
+      <div class="food-deal"><img src="https://placehold.co/200x120/FF9F6E/white?text=ButterChicken" style="width:100%; border-radius:24px;"><h3>Butter Chicken Feast</h3><p>Punjab Grill, Delhi</p><span class="price-old">₹499</span> <span class="price-new">₹199</span><br><button class="btn btn-primary">Save Meal</button></div>
+      <div class="food-deal"><img src="https://placehold.co/200x120/8FBF9F/white?text=Pastry" style="width:100%; border-radius:24px;"><h3>Chocolate Pastry Box</h3><p>The Dessert Studio, Pune</p><span class="price-old">₹450</span> <span class="price-new">₹149</span><br><button class="btn btn-primary">Save Meal</button></div>
+    </div>
+  </section>
+
+  <!-- APP SHOWCASE mockup -->
+  <section class="container reveal" style="text-align:center;">
+    <h2>Experience the ReBite App</h2>
+    <div style="display: flex; gap: 1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem;">
+      <div class="mock-card" style="position:relative; width:200px;"><i class="fas fa-mobile-alt"></i> Login Screen <br> <i class="fas fa-leaf"></i> Eco-mode</div>
+      <div class="mock-card" style="position:relative; width:200px;"><i class="fas fa-list"></i> Home Feed: Masala Dosa ₹69</div>
+      <div class="mock-card" style="position:relative; width:200px;"><i class="fas fa-credit-card"></i> Checkout: UPI / PhonePe</div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="container reveal">
+    <h2>❤️ Loved by Indians</h2>
+    <div class="card-grid">
+      <div class="testimonial-card"><i class="fas fa-star" style="color:gold;"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><p>"ReBite saved me ₹2000 last month! Fresh Paneer Biryani at half price."</p><h4>- Anjali, Student (Mumbai)</h4></div>
+      <div class="testimonial-card"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><p>"Our Pune restaurant increased profit by 22% and zero waste. Game-changer!"</p><h4>- Rajesh, Owner, Flavours of Pune</h4></div>
+      <div class="testimonial-card"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><p>"Convenient pickup in Bengaluru, UPI payments smooth. Eco impact is inspiring."</p><h4>- Vikram, Office worker</h4></div>
+    </div>
+  </section>
+
+  <!-- IMPACT SECTION -->
+  <section id="impact" class="container reveal" style="background: linear-gradient(145deg, var(--beige), var(--cream)); border-radius: 4rem; margin-bottom:2rem;">
+    <div style="text-align:center"><i class="fas fa-seedling" style="font-size:3rem;"></i><h2>Together We’re Reducing Food Waste Across India.</h2><div class="stats-grid"><div class="stat-card"><div class="stat-number" data-count="14500">0</div><p>Lives Impacted</p></div><div class="stat-card"><div class="stat-number" data-count="4100">0</div><p>Kg CO₂ Saved</p></div></div></div>
+  </section>
+
+  <!-- DOWNLOAD APP CTA -->
+  <section id="download" class="container reveal" style="background: var(--sage); border-radius: 3rem; padding: 3rem; text-align:center;">
+    <h2 style="color:var(--dark);">Download the ReBite App</h2>
+    <p>Start saving delicious food and money in seconds.</p>
+    <div style="display:flex; gap:1rem; justify-content:center; margin-top:1rem;"><button class="btn btn-primary"><i class="fab fa-apple"></i> App Store</button><button class="btn btn-outline"><i class="fab fa-google-play"></i> Google Play</button></div>
+  </section>
+
+  <!-- FAQ Accordion -->
+  <section class="container reveal">
+    <h2>FAQs</h2>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-question">How does ReBite work? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">Restaurants list surplus meals at up to 70% off, you reserve & pick up.</div></div>
+      <div class="faq-item"><div class="faq-question">Is the food safe? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">Absolutely. Meals are within safe consumption windows, quality-checked partners.</div></div>
+      <div class="faq-item"><div class="faq-question">How do restaurants benefit? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">Extra revenue + reduce waste + analytics dashboard + tax benefits.</div></div>
+      <div class="faq-item"><div class="faq-question">What payment methods are supported? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">UPI, PhonePe, Google Pay, Paytm, and credit/debit cards.</div></div>
+      <div class="faq-item"><div class="faq-question">Can students use ReBite? <i class="fas fa-chevron-down"></i></div><div class="faq-answer">Definitely! Student budgets love discounts + eco impact.</div></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:2rem;">
+    <div><div class="logo">ReBite</div><p>Save Food. Save Money.</p></div>
+    <div><h4>Quick Links</h4><a href="#home">Home</a><br><a href="#features">Features</a><br><a href="#business">Business</a></div>
+    <div><h4>Social</h4><i class="fab fa-instagram"></i> <i class="fab fa-twitter"></i> <i class="fab fa-linkedin"></i></div>
+    <div><h4>Subscribe</h4><input type="email" placeholder="Your email" style="padding:0.6rem; border-radius:40px; border:none;"><button class="btn btn-primary" style="margin-top:8px;">Join</button></div>
+  </div>
+  <hr style="margin:2rem 0; border-color:var(--glass-border);"><p style="text-align:center;">&copy; 2025 ReBite – Reducing food waste across Mumbai, Virar, Pune, Bengaluru, Delhi.</p>
+</footer>
+
+<script>
+  // loader
+  window.addEventListener('load', () => {
+    setTimeout(() => { document.getElementById('loader').classList.add('hide'); }, 1000);
+  });
+
+  // mobile menu
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+  mobileBtn.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+  // dark mode
+  const darkToggle = document.getElementById('darkModeToggle');
+  darkToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    darkToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark';
+  });
+
+  // counter animation on scroll
+  const counters = document.querySelectorAll('.stat-number');
+  let counted = false;
+  function animateCounters() {
+    if(counted) return;
+    counters.forEach(c => {
+      const target = parseInt(c.getAttribute('data-count'));
+      let current = 0;
+      const increment = target / 50;
+      const updateCounter = () => {
+        current += increment;
+        if(current < target) { c.innerText = Math.ceil(current); requestAnimationFrame(updateCounter); }
+        else c.innerText = target;
+      };
+      updateCounter();
+    });
+    counted = true;
+  }
+
+  // scroll reveal + trigger counters when stats visible
+  const reveals = document.querySelectorAll('.reveal');
+  const statsSection = document.getElementById('statsSection');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        entry.target.classList.add('active');
+        if(entry.target === statsSection || statsSection.contains(entry.target)) animateCounters();
+      }
+    });
+  }, { threshold: 0.2 });
+  reveals.forEach(el => observer.observe(el));
+  observer.observe(statsSection);
+
+  // ripple effect
+  document.querySelectorAll('.ripple-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      const x = e.clientX - e.target.getBoundingClientRect().left;
+      const y = e.clientY - e.target.getBoundingClientRect().top;
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-question');
+    q.addEventListener('click', () => {
+      item.classList.toggle('active');
+      const icon = q.querySelector('i');
+      icon.classList.toggle('fa-chevron-down');
+      icon.classList.toggle('fa-chevron-up');
+    });
+  });
+
+  // Parallax effect (mouse move on hero cards)
+  document.querySelector('.floating-cards')?.addEventListener('mousemove', (e) => {
+    const cards = document.querySelectorAll('.mock-card');
+    const x = (e.clientX / window.innerWidth) * 20;
+    const y = (e.clientY / window.innerHeight) * 20;
+    cards.forEach((card, idx) => {
+      card.style.transform = `translate(${x * (idx+1) * 0.05}px, ${y * (idx+1) * 0.05}px)`;
+    });
+  });
+
+  // floating particles background (canvas)
+  const canvas = document.createElement('canvas');
+  canvas.id = 'particles-canvas';
+  document.body.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  for(let i=0;i<80;i++) { particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, radius: Math.random()*3+1, alpha: Math.random()*0.5, dx: (Math.random()-0.5)*0.2, dy: (Math.random()-0.5)*0.1 }); }
+  function drawParticles() {
+    if(!ctx) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(143,191,159, ${p.alpha*0.4})`;
+      ctx.fill();
+      p.x += p.dx; p.y += p.dy;
+      if(p.x<0 || p.x>canvas.width) p.dx *= -1;
+      if(p.y<0 || p.y>canvas.height) p.dy *= -1;
+    });
+    requestAnimationFrame(drawParticles);
+  }
+  drawParticles();
+
+  // smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if(target) target.scrollIntoView({ behavior: 'smooth' });
+      if(navLinks.classList.contains('active')) navLinks.classList.remove('active');
+    });
+  });
+</script>
+</body>
+</html>
